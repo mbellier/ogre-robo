@@ -29,6 +29,10 @@ namespace OgreRobo
             a.entity.CastShadows = true;
             sceneMgr.RootSceneNode.CreateChildSceneNode().AttachObject(a.entity);
 
+            AnimationState anim = a.entity.GetAnimationState("Walk");
+            anim.Loop = true;
+            anim.Enabled = true;
+
             environment.agentList.Add(a);
 
             a.RandomPosition();
@@ -74,7 +78,7 @@ namespace OgreRobo
 
         public Agent()
         {
-            this.speed = 750f;
+            this.speed = 150f;
             this.positionTolerance = 1;
             meshOrientation = new Quaternion(0, new Vector3(0, 0, 0));
         }
@@ -153,6 +157,9 @@ namespace OgreRobo
 
         public void Update(float dt)
         {
+            AnimationState anim = entity.GetAnimationState("Walk");
+            anim.AddTime(dt);
+
             if (!Move(dt))
             {
            
