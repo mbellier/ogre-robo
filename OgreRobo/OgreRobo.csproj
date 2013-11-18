@@ -37,6 +37,8 @@
     <StartupObject>OgreRobo.OgreRobo</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Agent.cs" />
+    <Compile Include="AgentEnvironment.cs" />
     <Compile Include="OgreRobo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -55,7 +57,9 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
