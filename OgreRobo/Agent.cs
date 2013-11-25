@@ -73,13 +73,16 @@ namespace OgreRobo
         public Quaternion meshOrientation { get; set; }
 
         public float positionTolerance { get; set; }
+        public float targetRadius { get; set; }
         public float speed { get; set; }
         public Vector3 destination;
+        public Agent target;
 
         public Agent()
         {
             this.speed = 150f;
             this.positionTolerance = 1;
+            this.targetRadius = 100;
             meshOrientation = new Quaternion(0, new Vector3(0, 0, 0));
         }
 
@@ -127,12 +130,27 @@ namespace OgreRobo
         public bool Move(float dt)
         {
             Vector3 pos = GetPosition();
+            
+            foreach (Agent a in environment.agentList)
+            {
+                if (pos.PositionEquals(a.GetPosition(), 100) && a.team != this.team)
+                {
+                    target = a;
+                }
+            }
+
+            if (target != null)
+            {
+                destination = target.GetPosition();
+            }
+            
             if (!pos.PositionEquals(destination, positionTolerance ))
             {
                 //move
                 
                 //position
-                Vector3 movement = (destination - pos);
+                Vector3 movement;
+                movement = (destination - pos);
                 movement = movement / movement.Normalise();
                 pos += movement * dt * speed;
                 SetPosition(pos);
@@ -162,9 +180,9 @@ namespace OgreRobo
 
             if (!Move(dt))
             {
-           
                 GoTo(environment.GetRandomPosition());
             }
         }
     }
 }
+ 
