@@ -7,10 +7,8 @@ namespace OgreRobo
 {
     class OgreRobo : BaseApplication
     {
-        Entity ninja;
-        AnimationState anim;
-
-        public int xmin = -1000, xmax = 1000, zmin = -1000, zmax = 1000;
+        public int initNbAgents = 100;
+        Rect mapDomain = new Rect ( -1000, 1000, 1000, -1000);
 
         AgentEnvironment agentEnvironment;
         AgentFactory agentFactory;
@@ -23,6 +21,7 @@ namespace OgreRobo
         protected override void CreateScene()
         {
             mRoot.FrameRenderingQueued += new FrameListener.FrameRenderingQueuedHandler(FrameRenderingQueued);
+            
 
             // scene configuration //////////
     
@@ -33,22 +32,11 @@ namespace OgreRobo
             // setting sky box
             mSceneMgr.SetSkyDome(true, "Examples/CloudySky", 5, 4);
 
-            // managing entities ///////////
-
-            // adding new entity
-            ninja = mSceneMgr.CreateEntity("ninja", "robot.mesh");
-            ninja.CastShadows = true;
-            mSceneMgr.RootSceneNode.CreateChildSceneNode().AttachObject(ninja);
-
-            anim = ninja.GetAnimationState("Walk");
-            anim.Loop = true;
-            anim.Enabled = true;
-
             // ground
             Plane plane = new Plane(Vector3.UNIT_Y, 0);
             MeshManager.Singleton.CreatePlane("ground",
                 ResourceGroupManager.DEFAULT_RESOURCE_GROUP_NAME, plane,
-                xmax-xmin, zmax-zmin, 20, 20, true, 1, 5, 5, Vector3.UNIT_Z);
+                System.Math.Abs(mapDomain.Width), System.Math.Abs(mapDomain.Height) , 20, 20, true, 1, 5, 5, Vector3.UNIT_Z);
             Entity groundEnt = mSceneMgr.CreateEntity("GroundEntity", "ground");
             mSceneMgr.RootSceneNode.CreateChildSceneNode().AttachObject(groundEnt);
             groundEnt.SetMaterialName("Examples/Rockwall");
@@ -56,11 +44,11 @@ namespace OgreRobo
  
 
             // Agents //////////////////
-            agentEnvironment = new AgentEnvironment (-1000,1000,-1000,1000);
+            agentEnvironment = new AgentEnvironment (mapDomain);
             agentFactory = new AgentFactory(mSceneMgr, agentEnvironment);
             agentFactory.spawnRobot();
             agentFactory.spawnOgre();
-            agentFactory.spawnRobotsAndOgres(4);
+            agentFactory.spawnRobotsAndOgres(initNbAgents);
         }
 
 
@@ -68,11 +56,7 @@ namespace OgreRobo
         bool FrameRenderingQueued(FrameEvent evt)
         {
             agentEnvironment.Update(evt.timeSinceLastFrame);
-            anim.AddTime(evt.timeSinceLastFrame);
-
-           
-            this.ninja.ParentNode.Position += new Vector3(.1f,0,0);
-
+            
             return true;
         }
 

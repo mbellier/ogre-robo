@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Mogre;
 
+
 namespace OgreRobo
 {
 
@@ -14,29 +15,26 @@ namespace OgreRobo
 
         public List<Agent> agentList { get; set; }
 
-        public float xmin, xmax, zmin, zmax;
+        public Rect mapDomain;
 
-        public AgentEnvironment(float xmin, float xmax, float zmin, float zmax)
+        public AgentEnvironment(Rect mapDomain)
         {
             rnd = new Random();
             agentList = new List<Agent>();
-            this.xmin = xmin;
-            this.xmax = xmax;
-            this.zmin = zmin;
-            this.zmax = zmax;
+            this.mapDomain = mapDomain;
         }
 
         public Vector3 GetRandomPosition()
         {
             return new Vector3(
-                (float)rnd.NextDouble() * (xmax - xmin) + xmin,
+                (float)rnd.NextDouble() * System.Math.Abs(mapDomain.Width) + mapDomain.left,
                 0,
-                (float)rnd.NextDouble() * (zmax - zmin) + zmin);
+                (float)rnd.NextDouble() * System.Math.Abs(mapDomain.Height) + mapDomain.bottom);
         }
 
         public void Update(float dt)
         {
-            Console.WriteLine(agentList.ElementAt(0).GetPosition());
+            
             foreach (Agent a in agentList)
             {
                 a.Update(dt);
