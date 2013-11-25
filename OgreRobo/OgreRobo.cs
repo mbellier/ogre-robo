@@ -7,7 +7,7 @@ namespace OgreRobo
 {
     class OgreRobo : BaseApplication
     {
-        public int initNbAgents = 100;
+        public int initNbAgents = 10;
         Rect mapDomain = new Rect ( -1000, 1000, 1000, -1000);
 
         AgentEnvironment agentEnvironment;

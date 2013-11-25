@@ -24,7 +24,8 @@ namespace OgreRobo
 
             a.team = team;
             a.environment = environment;
-
+            a.destination = environment.GetRandomPosition();
+            
             a.entity = entity;
             a.entity.CastShadows = true;
             sceneMgr.RootSceneNode.CreateChildSceneNode().AttachObject(a.entity);
@@ -81,7 +82,7 @@ namespace OgreRobo
         public Agent()
         {
             this.speed = 150f;
-            this.positionTolerance = 1;
+            this.positionTolerance = 10;
             this.targetRadius = 100;
             meshOrientation = new Quaternion(0, new Vector3(0, 0, 0));
         }
@@ -130,20 +131,6 @@ namespace OgreRobo
         public bool Move(float dt)
         {
             Vector3 pos = GetPosition();
-            
-            foreach (Agent a in environment.agentList)
-            {
-                if (pos.PositionEquals(a.GetPosition(), 100) && a.team != this.team)
-                {
-                    target = a;
-                }
-            }
-
-            if (target != null)
-            {
-                destination = target.GetPosition();
-            }
-            
             if (!pos.PositionEquals(destination, positionTolerance ))
             {
                 //move
@@ -177,9 +164,29 @@ namespace OgreRobo
         {
             AnimationState anim = entity.GetAnimationState("Walk");
             anim.AddTime(dt);
-
+            
+            if (target != null)
+            {
+                GoTo(target.GetPosition());
+            }
+            else
+            {
+                foreach (Agent a in environment.agentList)
+                {
+                    if (GetPosition().PositionEquals(a.GetPosition(), 100) && a.team != this.team)
+                    {
+                        target = a;
+                    }
+                }
+            }
+            
             if (!Move(dt))
             {
+                if (target != null)
+                {
+                    target.SetPosition(environment.GetRandomPosition());
+                    target = null;
+                }
                 GoTo(environment.GetRandomPosition());
             }
         }
