@@ -15,13 +15,18 @@ namespace OgreRobo
 
         public List<Agent> agentList { get; set; }
 
-        public Rectangle mapDomain;
+        public Rect mapDomain;
 
-        public AgentEnvironment(Rectangle mapDomain)
+        public AgentEnvironment(Rect mapDomain)
         {
             rnd = new Random();
             agentList = new List<Agent>();
             this.mapDomain = mapDomain;
+        }
+
+        public bool IsValidPosition(Vector3 pos)
+        {
+            return pos.x > mapDomain.left && pos.x < mapDomain.right && pos.y > mapDomain.bottom && pos.y < mapDomain.top;
         }
 
         public Vector3 GetRandomPosition()
