@@ -28,7 +28,8 @@ namespace OgreRobo
             
             a.entity = entity;
             a.entity.CastShadows = true;
-            sceneMgr.RootSceneNode.CreateChildSceneNode().AttachObject(a.entity);
+            a.node = sceneMgr.RootSceneNode.CreateChildSceneNode();
+            a.node.AttachObject(a.entity);
 
             AnimationState anim = a.entity.GetAnimationState("Walk");
             anim.Loop = true;
@@ -44,6 +45,7 @@ namespace OgreRobo
         public Agent spawnRobot(int team = 0)
         {
            Agent a = spawnAgent(team, sceneMgr.CreateEntity( "robot.mesh" ));
+           a.node.SetScale(new Vector3(1f, 1f, 1f) * 2.2f);
            return a;
         }
 
@@ -71,6 +73,7 @@ namespace OgreRobo
         public int team {get; set;}
         public AgentEnvironment environment { get; set; }
         public Entity entity { get; set; }
+        public SceneNode node { get; set; }
         public Quaternion meshOrientation { get; set; }
 
         public float positionTolerance { get; set; }
@@ -78,6 +81,7 @@ namespace OgreRobo
         public float speed { get; set; }
         public Vector3 destination;
         public Agent target;
+        public List<Agent> attackers;
 
         public int health { get; set; }
         public int maxHealth { get; set; }
@@ -92,6 +96,7 @@ namespace OgreRobo
             this.positionTolerance = 10;
             this.targetRadius = 100;
             meshOrientation = new Quaternion(0, new Vector3(0, 0, 0));
+            attackers = new List<Agent>();
         }
 
         public Vector3 GetPosition () {
@@ -176,23 +181,32 @@ namespace OgreRobo
 
         public void Update(float dt)
         {
-            AnimationState anim = entity.GetAnimationState("Walk");
-            anim.AddTime(dt);
-            
+            // Behaviour
             if (target != null)
             {
                 GoTo(target.GetPosition());
             }
             else
             {
+                List<Agent> list = new List<Agent>();
+
                 foreach (Agent a in environment.agentList)
                 {
                     if (GetPosition().PositionEquals(a.GetPosition(), 100) && a.team != this.team)
                     {
-                        target = a;
+                        list.Add(a);
                     }
                 }
+
+                if (list.Count > 0)
+                {
+                    target = list.ElementAt(environment.rnd.Next(list.Count));
+                }
             }
+
+            // update
+            AnimationState anim = entity.GetAnimationState("Walk");
+            anim.AddTime(dt);
             
             if (!Move(dt))
             {
