@@ -24,7 +24,8 @@ namespace OgreRobo
 
             a.team = team;
             a.environment = environment;
-
+            a.destination = environment.GetRandomPosition();
+            
             a.entity = entity;
             a.entity.CastShadows = true;
             sceneMgr.RootSceneNode.CreateChildSceneNode().AttachObject(a.entity);
@@ -73,8 +74,11 @@ namespace OgreRobo
         public Quaternion meshOrientation { get; set; }
 
         public float positionTolerance { get; set; }
+        public float targetRadius { get; set; }
         public float speed { get; set; }
         public Vector3 destination;
+        public Agent target;
+
         public int health { get; set; }
         public int maxHealth { get; set; }
         public int damages { get; set; }
@@ -85,7 +89,8 @@ namespace OgreRobo
             this.health = maxHealth;
             this.damages = 10;
             this.speed = 150f;
-            this.positionTolerance = 1;
+            this.positionTolerance = 10;
+            this.targetRadius = 100;
             meshOrientation = new Quaternion(0, new Vector3(0, 0, 0));
         }
 
@@ -120,10 +125,11 @@ namespace OgreRobo
 
         public void GoTo(Vector3 destination)
         {
-            Rectangle r = environment.mapDomain;
+			//TODO
+            //Rectangle r = environment.mapDomain;
             
 
-            if (new Vector2(destination.x, destination.y).
+            //if (new Vector2(destination.x, destination.y).
 
 
             this.destination = destination;
@@ -144,7 +150,8 @@ namespace OgreRobo
                 //move
                 
                 //position
-                Vector3 movement = (destination - pos);
+                Vector3 movement;
+                movement = (destination - pos);
                 movement = movement / movement.Normalise();
                 pos += movement * dt * speed;
                 SetPosition(pos);
@@ -171,12 +178,32 @@ namespace OgreRobo
         {
             AnimationState anim = entity.GetAnimationState("Walk");
             anim.AddTime(dt);
-
+            
+            if (target != null)
+            {
+                GoTo(target.GetPosition());
+            }
+            else
+            {
+                foreach (Agent a in environment.agentList)
+                {
+                    if (GetPosition().PositionEquals(a.GetPosition(), 100) && a.team != this.team)
+                    {
+                        target = a;
+                    }
+                }
+            }
+            
             if (!Move(dt))
             {
-           
+                if (target != null)
+                {
+                    target.SetPosition(environment.GetRandomPosition());
+                    target = null;
+                }
                 GoTo(environment.GetRandomPosition());
             }
         }
     }
 }
+ 
