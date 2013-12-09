@@ -15,9 +15,9 @@ namespace OgreRobo
 
         public List<Agent> agentList { get; set; }
 
-        public Rect mapDomain;
+        public Rectangle mapDomain;
 
-        public AgentEnvironment(Rect mapDomain)
+        public AgentEnvironment(Rectangle mapDomain)
         {
             rnd = new Random();
             agentList = new List<Agent>();
@@ -27,9 +27,9 @@ namespace OgreRobo
         public Vector3 GetRandomPosition()
         {
             return new Vector3(
-                (float)rnd.NextDouble() * System.Math.Abs(mapDomain.Width) + mapDomain.left,
+                (float)rnd.NextDouble() * System.Math.Abs(mapDomain.right - mapDomain.left) + mapDomain.left, 
                 0,
-                (float)rnd.NextDouble() * System.Math.Abs(mapDomain.Height) + mapDomain.bottom);
+                (float)rnd.NextDouble() * System.Math.Abs(mapDomain.top - mapDomain.bottom) + mapDomain.bottom);
         }
 
         public void Update(float dt)

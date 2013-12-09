@@ -75,9 +75,15 @@ namespace OgreRobo
         public float positionTolerance { get; set; }
         public float speed { get; set; }
         public Vector3 destination;
+        public int health { get; set; }
+        public int maxHealth { get; set; }
+        public int damages { get; set; }
 
         public Agent()
         {
+            this.maxHealth = 100;
+            this.health = maxHealth;
+            this.damages = 10;
             this.speed = 150f;
             this.positionTolerance = 1;
             meshOrientation = new Quaternion(0, new Vector3(0, 0, 0));
@@ -114,6 +120,12 @@ namespace OgreRobo
 
         public void GoTo(Vector3 destination)
         {
+            Rectangle r = environment.mapDomain;
+            
+
+            if (new Vector2(destination.x, destination.y).
+
+
             this.destination = destination;
         }
 
