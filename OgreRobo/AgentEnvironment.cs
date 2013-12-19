@@ -46,9 +46,11 @@ namespace OgreRobo
             {
                 a.Update(dt);
             }
+
             foreach (Agent a in deadList)
             {
                 agentList.Remove(a);
+                //a.scene.RootSceneNode.RemoveChild(a.node);
             }
             deadList.Clear();
         }
