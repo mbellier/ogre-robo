@@ -37,8 +37,9 @@ namespace OgreRobo
             mSceneMgr.SetWorldGeometry("terrain.cfg");
             int terrainSize = 25000;
             mSceneMgr.GetSceneNode("Terrain").SetPosition(-terrainSize / 2, -1, -terrainSize/2);
+    
 
-            /*
+            
             Plane plane = new Plane(Vector3.UNIT_Y, 0);
             MeshManager.Singleton.CreatePlane("ground",
                 ResourceGroupManager.DEFAULT_RESOURCE_GROUP_NAME, plane,
@@ -47,7 +48,7 @@ namespace OgreRobo
             mSceneMgr.RootSceneNode.CreateChildSceneNode().AttachObject(groundEnt);
             groundEnt.SetMaterialName("Custom/Dirt");
             groundEnt.CastShadows = false;
-            */
+            
  
             // fog
             //ColourValue fadeColour = new ColourValue(0.09f, 0.09f, 0.09f);
@@ -73,12 +74,18 @@ namespace OgreRobo
 
             Light pointLight = mSceneMgr.CreateLight("pointLight");
             pointLight.Type = Light.LightTypes.LT_POINT;
-            pointLight.Position = new Vector3(0, 200, 0);
+            pointLight.Position = new Vector3(0, 2000, 0);
 
 
+            // fire
+            /*
+            ParticleSystem fireParticle = mSceneMgr.CreateParticleSystem("Fire", "Particles/Fire");
+            SceneNode particleNode = mSceneMgr.RootSceneNode.CreateChildSceneNode("Particle");
+            particleNode.AttachObject(fireParticle);
 
-        
-
+             * 
+             */
+             
             // Agents //////////////////
             agentEnvironment = new AgentEnvironment(mapDomain, mSceneMgr);
             agentEnvironment.newRound();
