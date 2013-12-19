@@ -9,7 +9,7 @@ material Custom/Dirt
 
 			texture_unit
 			{
-				texture terrain_texture.jpg
+				texture terr_rock-dirt.jpg
 			}
 		}
 	}
