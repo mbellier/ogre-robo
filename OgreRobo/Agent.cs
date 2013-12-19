@@ -132,14 +132,8 @@ namespace OgreRobo
 
         public void GoTo(Vector3 destination)
         {
-			//TODO
-            //Rectangle r = environment.mapDomain;
-            
-
-            //if (new Vector2(destination.x, destination.y).
-
-
-            this.destination = destination;
+			if (environment.IsValidPosition(destination))
+                this.destination = destination; 
         }
 
         public void LookAt(Quaternion orientation)

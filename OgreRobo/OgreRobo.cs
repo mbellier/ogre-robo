@@ -8,7 +8,7 @@ namespace OgreRobo
     class OgreRobo : BaseApplication
     {
         public int initNbAgents = 30;
-        Rect mapDomain = new Rect ( -2000, 2000, 2000, -2000);
+        Rect mapDomain = new Rect (-2000, 2000, 2000, -2000);
 
         AgentEnvironment agentEnvironment;
         AgentFactory agentFactory;
