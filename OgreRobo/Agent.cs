@@ -28,6 +28,7 @@ namespace OgreRobo
             
             a.entity = entity;
             a.entity.CastShadows = true;
+            a.scene = sceneMgr;
             a.node = sceneMgr.RootSceneNode.CreateChildSceneNode();
             a.node.AttachObject(a.entity);
 
@@ -73,6 +74,7 @@ namespace OgreRobo
         public int team {get; set;}
         public AgentEnvironment environment { get; set; }
         public Entity entity { get; set; }
+        public SceneManager scene { get; set; }
         public SceneNode node { get; set; }
         public Quaternion meshOrientation { get; set; }
 
@@ -80,7 +82,7 @@ namespace OgreRobo
         public float targetRadius { get; set; }
         public float speed { get; set; }
         public Vector3 destination;
-        public Agent target;
+        public Agent myTarget;
         public List<Agent> attackers;
 
         public int health { get; set; }
@@ -178,13 +180,37 @@ namespace OgreRobo
            
         }
 
+        public void target(Agent target)
+        {
+            myTarget = target;
+            myTarget.attackers.Add(this);
+        }
+
+        public void die()
+        {
+            if (myTarget != null)
+            {
+                myTarget.attackers.Remove(this);
+                myTarget = null;
+            }
+
+            foreach (Agent a in attackers)
+            {
+                a.myTarget = null;
+            }
+            attackers.Clear();
+
+            RandomPosition();
+            environment.deadList.Add(this);
+            scene.RootSceneNode.RemoveChild(node);
+        }
 
         public void Update(float dt)
         {
             // Behaviour
-            if (target != null)
+            if (myTarget != null)
             {
-                GoTo(target.GetPosition());
+                GoTo(myTarget.GetPosition());
             }
             else
             {
@@ -200,7 +226,7 @@ namespace OgreRobo
 
                 if (list.Count > 0)
                 {
-                    target = list.ElementAt(environment.rnd.Next(list.Count));
+                    target(list.ElementAt(environment.rnd.Next(list.Count)));
                 }
             }
 
@@ -210,10 +236,9 @@ namespace OgreRobo
             
             if (!Move(dt))
             {
-                if (target != null)
+                if (myTarget != null)
                 {
-                    target.SetPosition(environment.GetRandomPosition());
-                    target = null;
+                    myTarget.die();
                 }
                 GoTo(environment.GetRandomPosition());
             }
