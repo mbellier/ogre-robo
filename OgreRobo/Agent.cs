@@ -59,7 +59,12 @@ namespace OgreRobo
 
         public Agent spawnOgre(int team = 1)
         {
-            Agent a = spawnAgent(team, sceneMgr.CreateEntity( "ninja.mesh" ));
+            Entity e1 = sceneMgr.CreateEntity("ninja.mesh");
+            Agent a = spawnAgent(team, e1);
+
+           // Entity e2 = sceneMgr.CreateEntity("ogrehead.mesh");
+           // a.node.CreateChildSceneNode(new Vector3(0, 180, -20), new Quaternion(Mogre.Math.PI, new Vector3(0, 1, 0))).AttachObject(e2);
+
             a.meshOrientation = new Quaternion(-Mogre.Math.PI / 2, new Vector3(0, 1, 0));
             environment.nbNinja++;
             return a;
