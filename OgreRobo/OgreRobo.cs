@@ -7,12 +7,9 @@ namespace OgreRobo
 {
     class OgreRobo : BaseApplication
     {
-
-        public int initNbAgents = 30;
-        Rect mapDomain = new Rect(-2000, 2000, 2000, -2000);
+        Rect mapDomain = new Rect (-2000, 2000, 2000, -2000);
 
         AgentEnvironment agentEnvironment;
-        AgentFactory agentFactory;
 
         public static void Main()
         {
@@ -90,11 +87,8 @@ namespace OgreRobo
              */
              
             // Agents //////////////////
-            agentEnvironment = new AgentEnvironment (mapDomain);
-            agentFactory = new AgentFactory(mSceneMgr, agentEnvironment);
-            agentFactory.spawnRobot();
-            agentFactory.spawnOgre();
-            agentFactory.spawnRobotsAndOgres(initNbAgents);
+            agentEnvironment = new AgentEnvironment(mapDomain, mSceneMgr);
+            agentEnvironment.newRound();
         }
 
 
@@ -102,7 +96,6 @@ namespace OgreRobo
         bool FrameRenderingQueued(FrameEvent evt)
         {
             agentEnvironment.Update(evt.timeSinceLastFrame);
-
             return true;
         }
 

@@ -53,6 +53,7 @@ namespace OgreRobo
         {
            Agent a = spawnAgent(team, sceneMgr.CreateEntity( "robot.mesh" ));
            a.node.SetScale(new Vector3(1f, 1f, 1f) * 2.2f);
+           environment.nbRobot++;
            return a;
         }
 
@@ -65,8 +66,7 @@ namespace OgreRobo
            // a.node.CreateChildSceneNode(new Vector3(0, 180, -20), new Quaternion(Mogre.Math.PI, new Vector3(0, 1, 0))).AttachObject(e2);
 
             a.meshOrientation = new Quaternion(-Mogre.Math.PI / 2, new Vector3(0, 1, 0));
-            
-            
+            environment.nbNinja++;
             return a;
         }
 
@@ -78,6 +78,8 @@ namespace OgreRobo
                 spawnRobot();
             }
         }
+
+
 
         public string getAttack(int team)
         {
@@ -130,16 +132,21 @@ namespace OgreRobo
         public float maxHealth { get; set; }
         public float damages { get; set; }
         public bool dying { get; set; }
+        public bool dead { get; set; }
+        public int frags { get; set; }
 
         public Agent()
         {
-            this.maxHealth = 100;
+            this.maxHealth = 10;
             this.health = maxHealth;
             this.damages = 10;
             this.speed = 150f;
             this.positionTolerance = 100;
             this.targetRadius = 100;
             this.dying = false;
+            this.dead = false;
+
+            this.frags = 0;
             meshOrientation = new Quaternion(0, new Vector3(0, 0, 0));
             attackers = new List<Agent>();
         }
@@ -266,13 +273,21 @@ namespace OgreRobo
         }
 
         public void Update(float dt)
-        {
-            if (dying)
+        {if (dying)
             {
                 death.AddTime(dt);
                 if (death.HasEnded)
                 {
-                    environment.deadList.Add(this);
+                    dead = true;
+
+                    if (team == 0)
+                    {
+                        environment.nbRobot--;
+                    }
+                    else
+                    {
+                        environment.nbNinja--;
+                    }
                 }
                 return;
             }
@@ -288,9 +303,13 @@ namespace OgreRobo
                     hit(myTarget, dt);
                 }
 
-                if (myTarget != null)
+                if (myTarget == null)
                 {
-                    return;
+                    frags++;
+                }
+                else
+                {
+                    return;   
                 }
             }
             else
