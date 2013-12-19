@@ -4,13 +4,15 @@ using System.Linq;
 using System.Text;
 using Mogre;
 
-
 namespace OgreRobo
 {
     class AgentFactory
     {
         public SceneManager sceneMgr { get; set; }
         public AgentEnvironment environment { get; set; }
+        public string[] ninjaAttack = new string[] { "Attack1", "Attack2", "Attack3", "SideKick", "Kick" };
+        public string[] ninjaDeath = new string[] { "Death1", "Death2" };
+
 
         public AgentFactory(SceneManager sceneMgr, AgentEnvironment e)
         {
@@ -28,12 +30,17 @@ namespace OgreRobo
             
             a.entity = entity;
             a.entity.CastShadows = true;
+            a.scene = sceneMgr;
             a.node = sceneMgr.RootSceneNode.CreateChildSceneNode();
             a.node.AttachObject(a.entity);
 
-            AnimationState anim = a.entity.GetAnimationState("Walk");
-            anim.Loop = true;
-            anim.Enabled = true;
+            a.walk = a.entity.GetAnimationState("Walk");
+            a.walk.Loop = true;
+            a.walk.Enabled = true;
+            a.attack = a.entity.GetAnimationState(getAttack(team));
+            a.attack.Loop = true;
+            a.death = a.entity.GetAnimationState(getDeath(team));
+            a.death.Loop = false;
 
             environment.agentList.Add(a);
 
@@ -71,6 +78,30 @@ namespace OgreRobo
                 spawnRobot();
             }
         }
+
+        public string getAttack(int team)
+        {
+            if (team == 0)
+            {
+                return "Shoot";
+            }
+            else
+            {
+                return ninjaAttack[environment.rnd.Next() % ninjaAttack.Length];
+            }
+        }
+
+        public string getDeath(int team)
+        {
+            if (team == 0)
+            {
+                return "Die";
+            }
+            else
+            {
+                return ninjaDeath[environment.rnd.Next() % ninjaDeath.Length];
+            }
+        }
     }
 
 
@@ -80,6 +111,7 @@ namespace OgreRobo
         public int team {get; set;}
         public AgentEnvironment environment { get; set; }
         public Entity entity { get; set; }
+        public SceneManager scene { get; set; }
         public SceneNode node { get; set; }
         public Quaternion meshOrientation { get; set; }
 
@@ -87,12 +119,17 @@ namespace OgreRobo
         public float targetRadius { get; set; }
         public float speed { get; set; }
         public Vector3 destination;
-        public Agent target;
+        public Agent myTarget;
         public List<Agent> attackers;
 
-        public int health { get; set; }
-        public int maxHealth { get; set; }
-        public int damages { get; set; }
+        public AnimationState walk;
+        public AnimationState attack;
+        public AnimationState death;
+
+        public float health { get; set; }
+        public float maxHealth { get; set; }
+        public float damages { get; set; }
+        public bool dying { get; set; }
 
         public Agent()
         {
@@ -100,8 +137,9 @@ namespace OgreRobo
             this.health = maxHealth;
             this.damages = 10;
             this.speed = 150f;
-            this.positionTolerance = 10;
+            this.positionTolerance = 100;
             this.targetRadius = 100;
+            this.dying = false;
             meshOrientation = new Quaternion(0, new Vector3(0, 0, 0));
             attackers = new List<Agent>();
         }
@@ -122,6 +160,11 @@ namespace OgreRobo
             SetPosition(environment.GetRandomPosition());
         }
 
+        public void GoTo(Vector3 destination)
+        {
+            if (environment.IsValidPosition(destination))
+                this.destination = destination;
+        }
 
         public Quaternion GetOrientation()
         {
@@ -133,32 +176,21 @@ namespace OgreRobo
             entity.ParentNode.Orientation = orientation;
         }
 
-
-
-        public void GoTo(Vector3 destination)
-        {
-			if (environment.IsValidPosition(destination))
-                this.destination = destination; 
-        }
-
         public void LookAt(Quaternion orientation)
         {
             entity.ParentNode.Rotate(orientation);
-           
-                entity.ParentNode.Rotate(meshOrientation);
+            entity.ParentNode.Rotate(meshOrientation);
         }
 
         public bool Move(float dt)
         {
             Vector3 pos = GetPosition();
-            if (!pos.PositionEquals(destination, positionTolerance ))
+            if (!pos.PositionEquals(destination, positionTolerance))
             {
-                //move
-                
                 //position
                 Vector3 movement;
                 movement = (destination - pos);
-                movement = movement / movement.Normalise();
+                movement.Normalise();
                 pos += movement * dt * speed;
                 SetPosition(pos);
 
@@ -168,57 +200,126 @@ namespace OgreRobo
                 Quaternion quat = src.GetRotationTo(movement);
                 LookAt(quat);
 
+                //animation
+                attack.Enabled = false;
+                walk.Enabled = true;
+                walk.AddTime(dt);
                 return true;
             }
             else
             {
-                // didn't move
-                SetPosition(destination);
+                walk.Enabled = false;
+                attack.Enabled = true;
+                attack.AddTime(dt);
                 return false;
             }
-           
+
         }
 
+        public void target(Agent target)
+        {
+            untarget();
+            myTarget = target;
+            myTarget.attackers.Add(this);
+            GoTo(myTarget.GetPosition());
+        }
+
+        public void untarget()
+        {
+            if (myTarget != null)
+            {
+                myTarget.attackers.Remove(this);
+                myTarget = null;
+            }
+        }
+
+        public void die()
+        {
+            dying = true;
+
+            untarget();
+            foreach (Agent a in attackers)
+            {
+                a.myTarget = null;
+            }
+            attackers.Clear();
+
+            walk.Enabled = false;
+            attack.Enabled = false;
+            death.Enabled = true;
+
+        }
+
+        public void takeDamage(float damage)
+        {
+            health -= damage;
+            if (health < 0)
+            {
+                die();
+            }
+        }
+
+        public void hit(Agent target,  float dt)
+        {
+            target.takeDamage(damages * dt);
+            target.target(this);
+        }
 
         public void Update(float dt)
         {
-            // Behaviour
-            if (target != null)
+            if (dying)
             {
-                GoTo(target.GetPosition());
+                death.AddTime(dt);
+                if (death.HasEnded)
+                {
+                    environment.deadList.Add(this);
+                }
+                return;
+            }
+
+            // Behaviour
+            if (myTarget != null)
+            {
+                GoTo(myTarget.GetPosition());
+                bool move = Move(dt);
+
+                if (!move)
+                {
+                    hit(myTarget, dt);
+                }
+
+                if (myTarget != null)
+                {
+                    return;
+                }
             }
             else
             {
-                List<Agent> list = new List<Agent>();
-
+                Agent possibleTarget = null;
+                float squareDist = 100 * positionTolerance * positionTolerance;
                 foreach (Agent a in environment.agentList)
                 {
-                    if (GetPosition().PositionEquals(a.GetPosition(), 100) && a.team != this.team)
+                    float tmpDist = (GetPosition() - a.GetPosition()).SquaredLength;
+                    if (tmpDist < squareDist && a.team != this.team && a.dying == false)
                     {
-                        list.Add(a);
+                        possibleTarget = a;
+                        squareDist = tmpDist;
                     }
                 }
 
-                if (list.Count > 0)
+                if (possibleTarget != null)
                 {
-                    target = list.ElementAt(environment.rnd.Next(list.Count));
+                    target(possibleTarget);
                 }
-            }
 
-            // update
-            AnimationState anim = entity.GetAnimationState("Walk");
-            anim.AddTime(dt);
-            
-            if (!Move(dt))
-            {
-                if (target != null)
+                bool move = Move(dt);
+                if (!move)
                 {
-                    target.SetPosition(environment.GetRandomPosition());
-                    target = null;
+                    GoTo(environment.GetRandomPosition());
                 }
-                GoTo(environment.GetRandomPosition());
             }
         }
     }
 }
+
  

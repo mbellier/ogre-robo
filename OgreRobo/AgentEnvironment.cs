@@ -14,13 +14,15 @@ namespace OgreRobo
         public Random rnd;
 
         public List<Agent> agentList { get; set; }
-
+        public List<Agent> deadList { get; set; }
+        
         public Rect mapDomain;
 
         public AgentEnvironment(Rect mapDomain)
         {
             rnd = new Random();
             agentList = new List<Agent>();
+            deadList = new List<Agent>();
             this.mapDomain = mapDomain;
         }
 
@@ -44,6 +46,13 @@ namespace OgreRobo
             {
                 a.Update(dt);
             }
+
+            foreach (Agent a in deadList)
+            {
+                agentList.Remove(a);
+                //a.scene.RootSceneNode.RemoveChild(a.node);
+            }
+            deadList.Clear();
         }
     }
 }
