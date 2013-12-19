@@ -36,7 +36,7 @@ namespace OgreRobo
 
             mSceneMgr.SetWorldGeometry("terrain.cfg");
             int terrainSize = 25000;
-            mSceneMgr.GetSceneNode("Terrain").SetPosition(-terrainSize / 2, -1, -terrainSize/2);
+            mSceneMgr.GetSceneNode("Terrain").SetPosition(-terrainSize / 2, -5, -terrainSize/2);
     
 
             

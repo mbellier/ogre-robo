@@ -18,9 +18,7 @@ namespace OgreRobo
         public int  nbNinja = 0;
         public int nbRobot = 0;
         public int round = 0;
-
-        public float initHealth = 100;
-        public float initDamages = 10;
+        public Timer roundStart { get; set; }
         
         public Rect mapDomain;
         public SceneManager scene;
@@ -30,6 +28,7 @@ namespace OgreRobo
         {
             rnd = new Random();
             agentList = new List<Agent>();
+            roundStart = new Timer();
             this.mapDomain = mapDomain;
             this.scene = scene;
 
@@ -44,38 +43,52 @@ namespace OgreRobo
             }
             else
             {
-                Agent bestRobot = getBestAgent(0);
-                Agent bestNinja = getBestAgent(1);
-
-                Console.Out.Write("\n\nGénération : ");
-                Console.Out.Write(round);
-                Console.Out.Write(", Gagnant : ");
-                Console.Out.Write((nbRobot <= 0) ? "Ninja" : "Robot" );
-                Console.Out.Write("\nBest Robot :\n");
-                Console.Out.Write("   - Max Health : ");
-                Console.Out.Write(bestRobot.maxHealth);
-                Console.Out.Write("\n   - Max Damages : ");
-                Console.Out.Write(bestRobot.damages);
-                Console.Out.Write("\nBest Ninja :\n");
-                Console.Out.Write("   - Max Health : ");
-                Console.Out.Write(bestNinja.maxHealth);
-                Console.Out.Write("\n   - Max Damages : ");
-                Console.Out.Write(bestNinja.damages);
-
                 foreach (Agent a in agentList)
                 {
                     scene.RootSceneNode.RemoveChild(a.node);
+
+                    if (a.lifespan == 0)
+                    {
+                        a.lifespan = roundStart.Milliseconds;
+                    }
                 }
+                Agent bestRobot = getBestAgent(0);
+                Agent bestNinja = getBestAgent(1);
                 agentList.Clear();
+
+                Console.Out.Write("\n\nGénération : ");
+                Console.Out.Write(round);
+                Console.Out.Write(" (");
+                Console.Out.Write(roundStart.Milliseconds / 1000);
+                Console.Out.Write(" s)\nGagnant : ");
+                Console.Out.Write((nbRobot <= 0) ? "Ninja (" : "Robot (");
+                Console.Out.Write(nbNinja + nbRobot);
+                Console.Out.Write(")\n");
+                Console.Out.Write("\nBest Robot :\n");
+                Console.Out.Write("   - Max Health   : ");
+                Console.Out.Write(bestRobot.maxHealth);
+                Console.Out.Write("\n");
+                Console.Out.Write("   - Max Damages  : ");
+                Console.Out.Write(bestRobot.damages);
+                Console.Out.Write("\n");
+                Console.Out.Write("   - Durée de vie : ");
+                Console.Out.Write(bestRobot.lifespan / 1000);
+                Console.Out.Write(" s\n");
+                Console.Out.Write("Best Ninja :\n");
+                Console.Out.Write("   - Max Health   : ");
+                Console.Out.Write(bestNinja.maxHealth);
+                Console.Out.Write("\n");
+                Console.Out.Write("   - Max Damages  : ");
+                Console.Out.Write(bestNinja.damages);
+                Console.Out.Write("\n");
+                Console.Out.Write("   - Durée de vie : ");
+                Console.Out.Write(bestNinja.lifespan / 1000);
+                Console.Out.Write(" s\n");
 
                 nbRobot = 0;
                 nbNinja = 0;
                 agentFactory.spawnRobotsAndOgres(initNbAgents);
-
-
-                float factorRobot = bestRobot.maxHealth / initHealth;
-                float factorNinja = bestNinja.maxHealth / initHealth;
-
+                
                 foreach (Agent a in agentList)
                 {
                     float rand = (2 * (float) rnd.NextDouble() - 1);
@@ -83,18 +96,20 @@ namespace OgreRobo
 
                     if (a.team == 0)
                     {
-                        a.maxHealth = a.maxHealth * factorRobot + rand * 5;
-                        a.damages = a.damages * factorRobot + rand * -1;
+                        a.maxHealth = bestRobot.maxHealth + rand * 5;
+                        a.damages = bestRobot.damages + rand * -1;
                         a.health = a.maxHealth;
                     }
                     else
                     {
-                        a.maxHealth = a.maxHealth * factorNinja + rand * 5;
-                        a.damages = a.damages * factorNinja +  rand * -1;
+                        a.maxHealth = bestNinja.maxHealth + rand * 5;
+                        a.damages = bestNinja.damages +  rand * -1;
                         a.health = a.maxHealth;
                     }
                 }
             }
+
+            roundStart.Reset();
             round++;
         }
 
