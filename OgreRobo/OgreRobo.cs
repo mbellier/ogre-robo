@@ -1,11 +1,11 @@
-﻿
+﻿using System;
 using Mogre;
 using Mogre.TutorialFramework; // provides a simple 'BaseApplication' class
-using System;
+
 
 namespace OgreRobo
 {
-    class OgreRobo : BaseApplication
+    class OgreRobo : BaseApplication 
     {
         Rect mapDomain = new Rect (-2000, 2000, 2000, -2000);
 
@@ -14,6 +14,8 @@ namespace OgreRobo
         public static void Main()
         {
             new OgreRobo().Go();
+
+            
         }
 
         protected override void CreateScene()
@@ -78,13 +80,28 @@ namespace OgreRobo
 
 
             // fire
-            /*
-            ParticleSystem fireParticle = mSceneMgr.CreateParticleSystem("Fire", "Particles/Fire");
-            SceneNode particleNode = mSceneMgr.RootSceneNode.CreateChildSceneNode("Particle");
-            particleNode.AttachObject(fireParticle);
 
-             * 
-             */
+            ParticleSystem fireParticle = mSceneMgr.CreateParticleSystem("Fire", "CustomSmoke");//"TRPlayer/Torch");
+            SceneNode particleNode = mSceneMgr.RootSceneNode.CreateChildSceneNode("Particle");
+            particleNode.SetPosition(1000, 100, 1000);
+            particleNode.AttachObject(fireParticle);
+            Light pointLight2 = mSceneMgr.CreateLight();
+            pointLight2.Type = Light.LightTypes.LT_POINT;
+            pointLight2.Position = new Vector3(1000, 100, 1000);
+            pointLight2.DiffuseColour = ColourValue.Red;
+            //pointLight2.SpecularColour = ColourValue.Red;
+            Entity e = mSceneMgr.CreateEntity("Cylinder.mesh");
+            e.SetMaterialName("WoodPallet");
+            SceneNode n = mSceneMgr.RootSceneNode.CreateChildSceneNode();
+            
+            n.AttachObject(e);
+            n.SetPosition(1000, 50, 1000);
+            n.Scale(100, 10, 10);
+            n.Rotate(new Vector3(0, 0, 1), Mogre.Math.PI / 2);
+            
+            
+
+             
              
             // Agents //////////////////
             agentEnvironment = new AgentEnvironment(mapDomain, mSceneMgr);
@@ -107,7 +124,7 @@ namespace OgreRobo
         protected override void CreateCamera()
         {
             mCamera = mSceneMgr.CreateCamera("PlayerCam");
-            mCamera.Position = new Vector3(0, 2500, 4000);
+            mCamera.Position = new Vector3(0, 750, 2000);
             mCamera.LookAt(Vector3.ZERO);
             mCamera.NearClipDistance = 5;
             mCameraMan = new CameraMan(mCamera);
