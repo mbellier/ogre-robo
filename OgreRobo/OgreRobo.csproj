@@ -39,6 +39,10 @@
   <ItemGroup>
     <Compile Include="Agent.cs" />
     <Compile Include="AgentEnvironment.cs" />
+    <Compile Include="BaseApplication.cs" />
+    <Compile Include="BaseApplication.input.cs" />
+    <Compile Include="CameraMan.cs" />
+    <Compile Include="DebugOverlay.cs" />
     <Compile Include="OgreRobo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -50,11 +54,24 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\Mogre.TutorialFramework.dll</HintPath>
     </Reference>
+    <Reference Include="MogreFramework, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\MogreFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="MogreNewt, Version=2.20.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\MogreNewt.dll</HintPath>
+    </Reference>
     <Reference Include="MOIS, Version=1.1.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\MOIS.dll</HintPath>
     </Reference>
+    <Reference Include="OgreRobo.vshost, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\OgreRobo.vshost.exe</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -63,6 +80,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <NativeReference Include="MyApplication.app, Version=1.0.0.0">
+      <Name>OgreRobo.vshost.exe.manifest</Name>
+      <HintPath>bin\Debug\OgreRobo.vshost.exe.manifest</HintPath>
+    </NativeReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
