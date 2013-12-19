@@ -100,7 +100,7 @@ namespace OgreRobo
         protected override void CreateCamera()
         {
             mCamera = mSceneMgr.CreateCamera("PlayerCam");
-            mCamera.Position = new Vector3(0, 750, 2000);
+            mCamera.Position = new Vector3(0, 2500, 4000);
             mCamera.LookAt(Vector3.ZERO);
             mCamera.NearClipDistance = 5;
             mCameraMan = new CameraMan(mCamera);

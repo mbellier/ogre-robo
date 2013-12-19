@@ -18,6 +18,9 @@ namespace OgreRobo
         public int  nbNinja = 0;
         public int nbRobot = 0;
         public int round = 0;
+
+        public float initHealth = 100;
+        public float initDamages = 10;
         
         public Rect mapDomain;
         public SceneManager scene;
@@ -44,13 +47,53 @@ namespace OgreRobo
                 Agent bestRobot = getBestAgent(0);
                 Agent bestNinja = getBestAgent(1);
 
+                Console.Out.Write("\n\nGénération : ");
+                Console.Out.Write(round);
+                Console.Out.Write(", Gagnant : ");
+                Console.Out.Write((nbRobot <= 0) ? "Ninja" : "Robot" );
+                Console.Out.Write("\nBest Robot :\n");
+                Console.Out.Write("   - Max Health : ");
+                Console.Out.Write(bestRobot.maxHealth);
+                Console.Out.Write("\n   - Max Damages : ");
+                Console.Out.Write(bestRobot.damages);
+                Console.Out.Write("\nBest Ninja :\n");
+                Console.Out.Write("   - Max Health : ");
+                Console.Out.Write(bestNinja.maxHealth);
+                Console.Out.Write("\n   - Max Damages : ");
+                Console.Out.Write(bestNinja.damages);
+
                 foreach (Agent a in agentList)
                 {
                     scene.RootSceneNode.RemoveChild(a.node);
                 }
                 agentList.Clear();
 
-                agentFactory.spawnRobotsAndOgres(initNbAgents);   
+                nbRobot = 0;
+                nbNinja = 0;
+                agentFactory.spawnRobotsAndOgres(initNbAgents);
+
+
+                float factorRobot = bestRobot.maxHealth / initHealth;
+                float factorNinja = bestNinja.maxHealth / initHealth;
+
+                foreach (Agent a in agentList)
+                {
+                    float rand = (2 * (float) rnd.NextDouble() - 1);
+                    
+
+                    if (a.team == 0)
+                    {
+                        a.maxHealth = a.maxHealth * factorRobot + rand * 5;
+                        a.damages = a.damages * factorRobot + rand * -1;
+                        a.health = a.maxHealth;
+                    }
+                    else
+                    {
+                        a.maxHealth = a.maxHealth * factorNinja + rand * 5;
+                        a.damages = a.damages * factorNinja +  rand * -1;
+                        a.health = a.maxHealth;
+                    }
+                }
             }
             round++;
         }
