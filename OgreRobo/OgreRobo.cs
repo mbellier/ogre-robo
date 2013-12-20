@@ -59,47 +59,46 @@ namespace OgreRobo
             
             //mSceneMgr.SetFog(FogMode.FOG_EXP2, fadeColour, 0.00025f);
 
-            //fog test
-            
-            //fadeColour = new ColourValue(0.1f, 0.1f, 0.1f);
-            //mWindow.GetViewport(0).BackgroundColour = fadeColour;
-            //mSceneMgr.SetFog(FogMode.FOG_LINEAR, fadeColour, 0, 10, 150);
-            //mSceneMgr.SetFog(FogMode.FOG_EXP2, fadeColour, 0.00025f);
-        
-            
 
-            //Plane plane;
-            //plane.d = 10000;
-            //plane.normal = Vector3.NEGATIVE_UNIT_Y;
 
             // light
 
+            /*
             Light pointLight = mSceneMgr.CreateLight("pointLight");
             pointLight.Type = Light.LightTypes.LT_POINT;
             pointLight.Position = new Vector3(0, 2000, 0);
-
+            */
 
             // fire
 
+            float x = 0, y = 0;
             ParticleSystem fireParticle = mSceneMgr.CreateParticleSystem("Fire", "CustomSmoke");//"TRPlayer/Torch");
             SceneNode particleNode = mSceneMgr.RootSceneNode.CreateChildSceneNode("Particle");
-            particleNode.SetPosition(1000, 100, 1000);
+            particleNode.SetPosition(x, 100, y);
             particleNode.AttachObject(fireParticle);
-            Light pointLight2 = mSceneMgr.CreateLight();
+            Light pointLight2 = mSceneMgr.CreateLight("test");
             pointLight2.Type = Light.LightTypes.LT_POINT;
-            pointLight2.Position = new Vector3(1000, 100, 1000);
-            pointLight2.DiffuseColour = ColourValue.Red;
-            //pointLight2.SpecularColour = ColourValue.Red;
+            pointLight2.Position = new Vector3(x, 500, y);
+            //pointLight2.DiffuseColour = ColourValue.White;
+            //pointLight2.SetAttenuation(5000,1, 1, 1);
+            //pointLight2.SetAttenuation(200000, 1, 0, 0);
+
             Entity e = mSceneMgr.CreateEntity("Cylinder.mesh");
             e.SetMaterialName("WoodPallet");
-            SceneNode n = mSceneMgr.RootSceneNode.CreateChildSceneNode();
-            
+            SceneNode n = mSceneMgr.RootSceneNode.CreateChildSceneNode();           
             n.AttachObject(e);
-            n.SetPosition(1000, 50, 1000);
-            n.Scale(100, 10, 10);
+            n.SetPosition(x, 45, y);
+            n.Scale(90, 10, 10);
             n.Rotate(new Vector3(0, 0, 1), Mogre.Math.PI / 2);
-            
-            
+
+
+            Light directionalLight = mSceneMgr.CreateLight("directionalLight");
+            directionalLight.Type = Light.LightTypes.LT_DIRECTIONAL;
+            directionalLight.DiffuseColour = new ColourValue(.25f, .25f, 0);
+            directionalLight.SpecularColour = new ColourValue(.25f, .25f, 0);
+            directionalLight.Direction = new Vector3(0, -1, 1);
+            directionalLight.Position = new Vector3(0, 200, 0);
+           directionalLight.PowerScale = 1000f ;
 
              
              
