@@ -87,9 +87,9 @@ namespace Mogre.TutorialFramework
             if (mGoingDown) move -= mCamera.Up;
 
             move.Normalise();
-            move *= 150; // Natural speed is 150 units/sec.
+            move *= 150 * 6; // Natural speed is 150 units/sec.
             if (mFastMove)
-                move *= 3; // With shift button pressed, move twice as fast.
+                move *= 2; // With shift button pressed, move twice as fast.
 
             if (move != Vector3.ZERO)
                 mCamera.Move(move * timeFragment);

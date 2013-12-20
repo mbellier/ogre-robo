@@ -127,7 +127,7 @@ namespace OgreRobo
             mCamera.LookAt(Vector3.ZERO);
             mCamera.NearClipDistance = 5;
             mCameraMan = new CameraMan(mCamera);
-            mCameraMan.FastMove = true;
+            
         }
 
         protected override void CreateViewports()
