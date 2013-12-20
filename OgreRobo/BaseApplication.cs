@@ -77,6 +77,7 @@ namespace Mogre.TutorialFramework
 
             mDebugOverlay = new DebugOverlay(mWindow);
             mDebugOverlay.AdditionalInfo = "Bilinear";
+            
 
             return true;
         }

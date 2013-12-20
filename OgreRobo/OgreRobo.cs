@@ -31,7 +31,7 @@ namespace OgreRobo
             mSceneMgr.ShadowTechnique = ShadowTechnique.SHADOWTYPE_STENCIL_ADDITIVE;
 
             // setting sky box
-            mSceneMgr.SetSkyDome(true, "Examples/SpaceSkyPlane", 5, 2); // CloudySky
+            mSceneMgr.SetSkyDome(true, "Examples/SpaceSkyPlane",10, 4); 
             
 
             // ground
@@ -92,18 +92,12 @@ namespace OgreRobo
             n.Rotate(new Vector3(0, 0, 1), Mogre.Math.PI / 2);
 
 
-            Light directionalLight = mSceneMgr.CreateLight("directionalLight");
-            directionalLight.Type = Light.LightTypes.LT_DIRECTIONAL;
-            directionalLight.DiffuseColour = new ColourValue(.25f, .25f, 0);
-            directionalLight.SpecularColour = new ColourValue(.25f, .25f, 0);
-            directionalLight.Direction = new Vector3(0, -1, 1);
-            directionalLight.Position = new Vector3(0, 200, 0);
-           directionalLight.PowerScale = 1000f ;
-
-             
+            // text
+            TextAreaOverlayElement text = createTextOverlay();
+            text.Caption = "test";
              
             // Agents //////////////////
-            agentEnvironment = new AgentEnvironment(mapDomain, mSceneMgr);
+            agentEnvironment = new AgentEnvironment(mapDomain, mSceneMgr, text);
             agentEnvironment.newRound();
         }
 
@@ -123,7 +117,7 @@ namespace OgreRobo
         protected override void CreateCamera()
         {
             mCamera = mSceneMgr.CreateCamera("PlayerCam");
-            mCamera.Position = new Vector3(0, 750, 2000);
+            mCamera.Position = new Vector3(0, 780, 3500);
             mCamera.LookAt(Vector3.ZERO);
             mCamera.NearClipDistance = 5;
             mCameraMan = new CameraMan(mCamera);
@@ -135,6 +129,46 @@ namespace OgreRobo
             Viewport viewport = mWindow.AddViewport(mCamera);
             viewport.BackgroundColour = ColourValue.Black;
             mCamera.AspectRatio = (float)viewport.ActualWidth / viewport.ActualHeight;
+        }
+
+        public TextAreaOverlayElement createTextOverlay()
+        {
+            // Name the font we want to use
+            string fontFileName = @"bluehigh.ttf";
+
+            // Create the font resource
+            ResourceGroupManager.Singleton.AddResourceLocation("Media/fonts", "FileSystem");
+            ResourcePtr font = FontManager.Singleton.Create("MyFont", ResourceGroupManager.DEFAULT_RESOURCE_GROUP_NAME);
+            font.SetParameter("type", "truetype");
+            font.SetParameter("source", fontFileName);
+            font.SetParameter("size", "30");
+            font.SetParameter("resolution", "96");
+            font.Load();
+
+            // Create the overlay panel
+            OverlayContainer panel = OverlayManager.Singleton.CreateOverlayElement("Panel", "OverlayPanelName") as OverlayContainer;
+            panel.MetricsMode = GuiMetricsMode.GMM_PIXELS;
+            panel.SetPosition(10, 10);
+            panel.SetDimensions(300, 300);
+
+            // Create the text area
+            TextAreaOverlayElement textArea = OverlayManager.Singleton.CreateOverlayElement("TextArea", "TextAreaName") as TextAreaOverlayElement;
+            textArea.MetricsMode = GuiMetricsMode.GMM_PIXELS;
+            textArea.SetPosition(0, 0);
+            textArea.SetDimensions(300, 120);
+            textArea.CharHeight = 30;
+            textArea.FontName = "MyFont";
+            textArea.Caption = "";
+            textArea.ColourBottom = ColourValue.White;
+            textArea.ColourTop = ColourValue.White;
+            // Create the Overlay to link all
+            Overlay textOverlay = OverlayManager.Singleton.Create("The Text Overlay");
+            textOverlay.Add2D(panel);
+            panel.AddChild(textArea);
+
+            textOverlay.Show();
+
+            return textArea;
         }
     }
 }

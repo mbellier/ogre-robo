@@ -15,6 +15,7 @@ namespace Mogre.TutorialFramework
         protected OverlayElement mGuiWorst;
         protected OverlayElement mGuiTris;
         protected OverlayElement mModesText;
+
         protected string         mAdditionalInfo = "";
 
 
@@ -24,6 +25,7 @@ namespace Mogre.TutorialFramework
             mWindow = window;
 
             var debugOverlay = OverlayManager.Singleton.GetByName("Core/DebugOverlay");
+
             debugOverlay.Show();
 
             mGuiAvg    = OverlayManager.Singleton.GetOverlayElement("Core/AverageFps");
@@ -32,6 +34,9 @@ namespace Mogre.TutorialFramework
             mGuiWorst  = OverlayManager.Singleton.GetOverlayElement("Core/WorstFps");
             mGuiTris   = OverlayManager.Singleton.GetOverlayElement("Core/NumTris");
             mModesText = OverlayManager.Singleton.GetOverlayElement("Core/NumBatches");
+
+           
+
         }
 
         public string AdditionalInfo
@@ -52,7 +57,6 @@ namespace Mogre.TutorialFramework
                 mGuiWorst.Caption  = "Worst FPS: "      + stats.WorstFPS + " " + stats.WorstFrameTime + " ms";
                 mGuiTris.Caption   = "Triangle Count: " + stats.TriangleCount;
                 mModesText.Caption = mAdditionalInfo;
-
                 timeSinceLastDebugUpdate = 0;
             }
             else

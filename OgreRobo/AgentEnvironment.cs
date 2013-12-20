@@ -23,16 +23,81 @@ namespace OgreRobo
         public Rect mapDomain;
         public SceneManager scene;
         AgentFactory agentFactory;
+        TextAreaOverlayElement text;
 
-        public AgentEnvironment(Rect mapDomain, SceneManager scene)
+        public AgentEnvironment(Rect mapDomain, SceneManager scene, TextAreaOverlayElement text)
         {
             rnd = new Random();
             agentList = new List<Agent>();
             roundStart = new Timer();
             this.mapDomain = mapDomain;
             this.scene = scene;
+            this.text = text;
 
             agentFactory = new AgentFactory(scene, this);
+        }
+
+        public void updateText(Agent bestRobot, Agent bestNinja)
+        {
+            // Console
+
+            Console.Out.Write("\n\nGénération : ");
+            Console.Out.Write(round + 1);
+            Console.Out.Write(" (");
+            Console.Out.Write(roundStart.Milliseconds / 1000);
+            Console.Out.Write(" s)\nGagnant : ");
+            Console.Out.Write((nbRobot <= 0) ? "Ninja (" : "Robot (");
+            Console.Out.Write(nbNinja + nbRobot);
+            Console.Out.Write(")\n");
+            Console.Out.Write("\nBest Robot :\n");
+            Console.Out.Write("   - Max Health   : ");
+            Console.Out.Write(bestRobot.maxHealth);
+            Console.Out.Write("\n");
+            Console.Out.Write("   - Max Damages  : ");
+            Console.Out.Write(bestRobot.damages);
+            Console.Out.Write("\n");
+            Console.Out.Write("   - Durée de vie : ");
+            Console.Out.Write(bestRobot.lifespan / 1000);
+            Console.Out.Write(" s\n");
+            Console.Out.Write("Best Ninja :\n");
+            Console.Out.Write("   - Max Health   : ");
+            Console.Out.Write(bestNinja.maxHealth);
+            Console.Out.Write("\n");
+            Console.Out.Write("   - Max Damages  : ");
+            Console.Out.Write(bestNinja.damages);
+            Console.Out.Write("\n");
+            Console.Out.Write("   - Durée de vie : ");
+            Console.Out.Write(bestNinja.lifespan / 1000);
+            Console.Out.Write(" s\n");
+
+            // Overlay
+            text.Caption = "GENERATION " + (round+1)
+            + "\n\n[Previous generation]\n"
+            + "Duration: " + roundStart.Milliseconds / 1000 +  "s\n"
+            +"Winning team:\n" 
+            + ((nbRobot <= 0) ? "Ninjas (" : "Robots (")
+            + (nbNinja + nbRobot)
+            + ")\n"
+            + "\n[Best Robot]\n"
+            + "Health: "
+            + bestRobot.maxHealth.ToString("0.0")
+            + "\n"
+            + "Damages: "
+            + bestRobot.damages.ToString("0.0")
+            + "\n"
+            + "Survived "
+            + (bestRobot.lifespan / 1000).ToString("0")
+            + "s\n" + bestRobot.frags + " kills\n"
+            + "\n[Best Ninja]\n"
+            + "Health: "
+            + bestNinja.maxHealth.ToString("0.0")
+            + "\n"
+            + "Damages: "
+            + bestNinja.damages.ToString("0.0")
+            + "\n"
+            + "Survived "
+            + (bestNinja.lifespan / 1000).ToString("0")
+            + "s\n" + bestNinja.frags + " kills\n";
         }
 
         public void newRound()
@@ -40,6 +105,7 @@ namespace OgreRobo
             if (round == 0)
             {
                 agentFactory.spawnRobotsAndOgres(initNbAgents);
+                text.Caption = "GENERATION 1";
             }
             else
             {
@@ -56,34 +122,7 @@ namespace OgreRobo
                 Agent bestNinja = getBestAgent(1);
                 agentList.Clear();
 
-                Console.Out.Write("\n\nGénération : ");
-                Console.Out.Write(round);
-                Console.Out.Write(" (");
-                Console.Out.Write(roundStart.Milliseconds / 1000);
-                Console.Out.Write(" s)\nGagnant : ");
-                Console.Out.Write((nbRobot <= 0) ? "Ninja (" : "Robot (");
-                Console.Out.Write(nbNinja + nbRobot);
-                Console.Out.Write(")\n");
-                Console.Out.Write("\nBest Robot :\n");
-                Console.Out.Write("   - Max Health   : ");
-                Console.Out.Write(bestRobot.maxHealth);
-                Console.Out.Write("\n");
-                Console.Out.Write("   - Max Damages  : ");
-                Console.Out.Write(bestRobot.damages);
-                Console.Out.Write("\n");
-                Console.Out.Write("   - Durée de vie : ");
-                Console.Out.Write(bestRobot.lifespan / 1000);
-                Console.Out.Write(" s\n");
-                Console.Out.Write("Best Ninja :\n");
-                Console.Out.Write("   - Max Health   : ");
-                Console.Out.Write(bestNinja.maxHealth);
-                Console.Out.Write("\n");
-                Console.Out.Write("   - Max Damages  : ");
-                Console.Out.Write(bestNinja.damages);
-                Console.Out.Write("\n");
-                Console.Out.Write("   - Durée de vie : ");
-                Console.Out.Write(bestNinja.lifespan / 1000);
-                Console.Out.Write(" s\n");
+                updateText(bestRobot, bestNinja);
 
                 nbRobot = 0;
                 nbNinja = 0;
@@ -125,10 +164,12 @@ namespace OgreRobo
                         best = a;
                     }
                 }
-                else if (a.frags > best.frags && a.team == team)
+                // the best agent is the one with the most frags and the longest lifespan
+                else if ((a.team == team) && ((a.frags > best.frags) || (a.frags == best.frags && a.lifespan > best.lifespan)) )
                 {
                     best = a;
                 }
+
             }
 
             return best;
