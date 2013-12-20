@@ -27,10 +27,6 @@ namespace OgreRobo
             a.team = team;
             a.environment = environment;
             a.destination = environment.GetRandomPosition();
-
-            a.maxHealth = environment.initHealth;
-            a.damages = environment.initDamages;
-            a.health = a.maxHealth;
             
             a.entity = entity;
             a.entity.CastShadows = true;
@@ -124,28 +120,33 @@ namespace OgreRobo
         public float positionTolerance { get; set; }
         public float targetRadius { get; set; }
         public float speed { get; set; }
-        public Vector3 destination;
-        public Agent myTarget;
-        public List<Agent> attackers;
+        public Vector3 destination { get; set; }
+        public Agent myTarget { get; set; }
+        public List<Agent> attackers { get; set; }
 
-        public AnimationState walk;
-        public AnimationState attack;
-        public AnimationState death;
+        public AnimationState walk { get; set; }
+        public AnimationState attack { get; set; }
+        public AnimationState death { get; set; }
 
         public float health { get; set; }
         public float maxHealth { get; set; }
         public float damages { get; set; }
+        public uint lifespan { get; set; }
         public bool dying { get; set; }
         public bool dead { get; set; }
         public int frags { get; set; }
 
         public Agent()
         {
+            this.maxHealth = 100;
+            this.damages = 10;
+            this.health = this.maxHealth;
             this.speed = 150f;
             this.positionTolerance = 100;
             this.targetRadius = 100;
             this.dying = false;
             this.dead = false;
+            this.lifespan = 0;
             this.frags = 0;
             meshOrientation = new Quaternion(0, new Vector3(0, 0, 0));
             attackers = new List<Agent>();
@@ -255,6 +256,7 @@ namespace OgreRobo
             attack.Enabled = false;
             death.Enabled = true;
 
+            lifespan = environment.roundStart.Milliseconds;
         }
 
         public void takeDamage(float damage)
@@ -315,7 +317,7 @@ namespace OgreRobo
             else
             {
                 Agent possibleTarget = null;
-                float squareDist = 400 * positionTolerance * positionTolerance;
+                float squareDist = 225 * positionTolerance * positionTolerance;
                 foreach (Agent a in environment.agentList)
                 {
                     float tmpDist = (GetPosition() - a.GetPosition()).SquaredLength;
